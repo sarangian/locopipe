@@ -15,7 +15,6 @@ rule run_pcangsd_pca_global:
 
     shell:
         '''
-        conda env list > {log}
         mkdir -p {params.outdir}
         ## run pcangsd for PCA only (other options need to be added)
         pcangsd \
