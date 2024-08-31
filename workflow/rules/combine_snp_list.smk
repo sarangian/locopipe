@@ -15,7 +15,6 @@ rule combine_snp_list_global:
         subsetted_snp_list_bin = "{basedir}/angsd/snp_calling_global/combined.subsetted.snp_list.bin",
         done = touch("{basedir}/angsd/snp_calling_global/combined.subsetted.snp_list.done"),
     threads: 1
-    conda: "../envs/angsd.yaml"
     log: "{basedir}/angsd/snp_calling_global/combine_snp_list.log"
     shell:
         '''
