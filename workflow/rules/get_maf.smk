@@ -20,7 +20,6 @@ rule get_maf:
         minind=config["get_maf"]["minind"],
         mindepthind=config["get_maf"]["mindepthind"],
     log: "{basedir}/angsd/get_maf/{population}.{chr}.log"
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         mkdir -p {params.outdir}
