@@ -9,7 +9,6 @@ rule get_site_list_global:
     output:
         site_list = "{basedir}/angsd/get_depth_global/{chr}.site_list",
         site_list_idx = "{basedir}/angsd/get_depth_global/{chr}.site_list.idx"
-    conda: "../envs/angsd.yaml"
     threads: 1
     shell:
         '''
@@ -29,7 +28,6 @@ rule combine_site_list_global:
         site_list = "{basedir}/angsd/get_depth_global/combined.site_list",
         site_list_idx = "{basedir}/angsd/get_depth_global/combined.site_list.idx"
     threads: 1
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         cat {input} > {output.site_list}
