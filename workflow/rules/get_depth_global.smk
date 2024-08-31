@@ -26,7 +26,6 @@ rule get_depth_global:
         minmapq = config["get_depth_global"]["minmapq"],
         extra = config["get_depth_global"]["extra"]
     log: "{basedir}/angsd/get_depth_global/{chr}.log"
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         mkdir -p {params.outdir}
