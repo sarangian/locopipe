@@ -26,7 +26,6 @@ rule get_theta:
         dosaf_extra=config["get_theta"]["dosaf_extra"],
         realsfs_extra=config["get_theta"]["realsfs_extra"],
     log: "{basedir}/angsd/get_theta/{population}.{chr}.log"
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         mkdir -p {params.outdir}
@@ -96,8 +95,6 @@ rule plot_sfs_distribution:
         rscript=config["global"]["scriptdir"] + "/plot_SFS.R",
     threads: 4
     log: "{basedir}/angsd/get_theta/sfs_distribution/{population}.plot_sfs_distribution.log"
-    conda:
-        "../envs/r.yaml" 
     shell:
         '''
         mkdir -p {params.outdir}
@@ -124,8 +121,6 @@ rule plot_theta_by_window:
         rscript = config["global"]["scriptdir"] + "/plot_theta_by_window.R",
     threads: 4
     log: "{basedir}/angsd/get_theta/{population}.plot_theta_by_window.log"
-    conda:
-        "../envs/r.yaml" 
     shell:
         '''
         mkdir -p {params.outdir}
