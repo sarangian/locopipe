@@ -18,7 +18,6 @@ rule get_fst:
         outbase = "{basedir}/angsd/get_fst/{population1}.{population2}.{chr}",
         extra = config["get_fst"]["extra"],
     log: "{basedir}/angsd/get_fst/{population1}.{population2}.{chr}.log"
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         mkdir -p {params.outdir}
@@ -47,9 +46,7 @@ rule plot_fst:
         fig_height = config["get_fst"]["fig_height"],
         fig_width = config["get_fst"]["fig_width"],
     log: "{basedir}/figures/fst/{population1}.{population2}.log"
-    conda: "../envs/r.yaml"
     shell:
         '''
-        # module load r  
         Rscript {params.rscript} {input.chr_table} {wildcards.basedir} {wildcards.population1} {wildcards.population2} {params.snp_window_size} {params.bp_window_size} {params.fig_height} {params.fig_width} &> {log}
         '''
