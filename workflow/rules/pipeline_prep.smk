@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pandas as pd
 
 def extract_bam_column_to_txt(input_tsv_file, output_basedir, separator, filename):
