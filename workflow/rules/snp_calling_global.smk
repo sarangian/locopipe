@@ -32,7 +32,6 @@ rule snp_calling_global:
         pval = config["snp_calling_global"]["pval"],
         extra = config["snp_calling_global"]["extra"]
     log: "{basedir}/angsd/snp_calling_global/{chr}.log"
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         MINDP=`cat {input.depth_filter} | tail -n 1 | cut -f 1`
