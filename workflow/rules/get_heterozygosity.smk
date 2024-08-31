@@ -27,7 +27,6 @@ rule get_heterozygosity:
     log: 
         dosaf = "{basedir}/angsd/heterozygosity/dosaf_{id}.log",
         realsfs = "{basedir}/angsd/heterozygosity/realsfs_{id}.log"
-    conda: "../envs/angsd.yaml"
     shell:
         '''
         mkdir -p {params.outdir}
@@ -65,8 +64,7 @@ rule plot_heterozygosity:
         rscript=config["global"]["scriptdir"] + "/plot_heterozygosity.R",
     threads: 1
     log: "{basedir}/angsd/heterozygosity/plot_heterozygosity.log"
-    conda:
-        "../envs/r.yaml" 
+   
     shell:
         '''
         mkdir -p {params.outdir}
