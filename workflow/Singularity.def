@@ -1,0 +1,140 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%labels
+
+
+%files
+
+%post
+    # Create necessary directories
+    mkdir -p local_scratch storage work
+    
+    # Set non-interactive mode for apt-get
+    export DEBIAN_FRONTEND="noninteractive"
+    
+
+    # Update and install required packages
+    apt-get -y update
+    apt-get install -y \
+        build-essential \
+        cmake \
+        cryptsetup \
+        curl \
+        cython3 \
+        dirmngr \
+        fuse3 \
+        git \
+        libbz2-dev \
+        libcairo2-dev \
+        libcurl4-openssl-dev \
+        libfontconfig1-dev \
+        libgsl-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libncursesw5-dev \
+        libssl-dev \
+        libuuid1 \
+        libxml2-dev \
+        locales \
+        make \
+        pkg-config \
+        runc \
+        software-properties-common \
+        squashfs-tools \
+        unzip \
+        wget \
+        zlib1g \
+        zlib1g-dev
+
+    apt-get clean
+
+    # Configure default locale
+    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+    locale-gen en_US.UTF-8
+    /usr/sbin/update-locale LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+
+
+    rm -rf /var/lib/apt/lists/*
+    
+    # Install Miniconda
+    cd /opt
+    wget "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" -O Miniconda_Install.sh
+    bash Miniconda_Install.sh -b -f -p /opt/conda
+    rm Miniconda_Install.sh
+
+    # Set up Conda and install mamba
+    export PATH="/opt/conda/bin:$PATH"
+    . /opt/conda/etc/profile.d/conda.sh
+    conda init bash
+    conda update -n base -c defaults conda -y
+    conda config --add channels bioconda
+    conda config --add channels conda-forge
+    conda install -y -c conda-forge mamba
+
+    # Clone and set up locopipe
+    cd /opt
+    git clone https://github.com/sarangian/locopipe.git
+    chmod 755 -R /opt/locopipe
+
+    cd locopipe/workflow
+    mv config.sh /usr/local/bin
+    chmod 755 /usr/local/bin/config.sh
+
+
+    cp /opt/locopipe/workflow/pipelines/locopipe.smk /opt/locopipe/locopipe.smk
+    cd /opt/locopipe
+    find . -name "*.smk" -exec sed -i '/^\s*conda:/ s/^/# /' {} \;
+    find . -name "*.smk" -exec sed -i 's|^\s*"\(\.\./envs\)|# "\1|' {} +
+    find . -name "*.smk" -exec sed -i 's|^\s*"\(pcangsd_lcpipe\)|# "\1|' {} +
+    find . -name "*.smk" -exec sed -i 's|^\s*"\(lostruct_lcpipe\)|# "\1|' {} +
+    
+    # Install environments for locopipe
+    mamba env create -f /opt/locopipe/workflow/envs/loco-pipe.yaml
+
+    # Install PCAngsd
+    cd /opt
+    git clone https://github.com/Rosemeis/pcangsd.git
+    cd pcangsd
+    git checkout 2880c6aafe5c8b075f7730779cc6f94fee2c9bbb
+    mamba env create -f /opt/locopipe/workflow/envs/angsd_lcpipe.yaml
+    conda activate angsd_lcpipe
+    conda install -c conda-forge -c bioconda cython numpy -y
+    python setup.py build_ext --inplace  
+    pip3 install --trusted-host pypi.org -e . 
+    conda deactivate
+
+
+    mamba env create -f /opt/locopipe/workflow/envs/lostruct_lcpipe.yaml
+    conda activate lostruct_lcpipe
+    R_LIBS="/opt/conda/envs/lostruct_lcpipe/lib/R/library" R --slave -e 'library("devtools"); devtools::install_github("petrelharp/local_pca/lostruct")'
+
+    # Remove unnecessary yaml files and install remaining environments
+    cd /opt/locopipe/workflow/envs
+    rm loco-pipe.yaml r_lcpipe.yaml angsd_lcpipe.yaml lostruct_lcpipe.yaml 
+    for i in *.yaml; do 
+        env=$(basename "$i" .yaml)
+        conda create -n $env -y
+        conda activate $env
+        mamba env update -f $i
+        conda deactivate
+    done
+    
+    # Clean up environments directory
+    cd /opt/locopipe/workflow/
+    rm -rf envs
+
+%environment
+    export LC_ALL=C.UTF-8 
+    export PATH=/opt/conda/bin:$PATH
+    export PATH=/usr/bin:$PATH
+    export PATH=/opt/locopipe/workflow/scripts:$PATH
+    export PATH=/usr/local/bin:$PATH
+    export PATH=/opt/conda/envs/loco-pipe/bin:$PATH
+    export PATH=/opt/conda/envs/angsd_lcpipe/bin:$PATH
+    export PATH=/opt/conda/envs/ohana_lcpipe/bin:$PATH
+    export PATH=/opt/conda/envs/pcangsd_lcpipe/bin:$PATH
+    export PATH=/opt/conda/envs/samtools_lcpipe/bin:$PATH
+    export PATH=/opt/conda/envs/lostruct_lcpipe/bin:$PATH
