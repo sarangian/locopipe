@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 ## Load packages
 library(tidyverse)
 library(cowplot)
