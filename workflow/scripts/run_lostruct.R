@@ -1,4 +1,3 @@
-#!/usr/bin/env Rscript
 ## This script read in PCA result in all windows and runs lostruct
 
 ## Load required packages
