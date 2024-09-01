@@ -18,6 +18,7 @@ rule run_pcangsd_pca_global:
         --beagle {input} \
         --snp_weights \
         --sites_save \
+        --minMaf {params.minmaf} \
         --threads {threads} \
         --out {params.outdir}/{wildcards.file} \
         &>> {log}
@@ -35,7 +36,6 @@ rule run_pcangsd_pca_local:
         minmaf=config["run_pcangsd_local"]["minmaf"],
     threads: config["run_pcangsd_local"]["threads"]
     log: "{basedir}/pcangsd/local/{population}.{file}.log"
-   
     shell:
         '''
         mkdir -p {params.outdir}
@@ -44,6 +44,7 @@ rule run_pcangsd_pca_local:
         --beagle {input} \
         --snp_weights \
         --sites_save \
+        --minMaf {params.minmaf} \
         --threads {threads} \
         --out {params.outdir}/{wildcards.population}.{wildcards.file} \
         &> {log}
