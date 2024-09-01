@@ -48,6 +48,7 @@ rule run_pcangsd_in_windows_global:
         --beagle $FILE \
         --snp_weights \
         --sites_save \
+        --minMaf {params.minmaf} \
         --threads {threads} \
         --out {params.outdir}/${{FILE%%.beagle.gz}} \
         &>> {log}
@@ -173,6 +174,7 @@ rule run_pcangsd_with_lostruct_outliers_global:
         --beagle {params.outdir}/${{PREFIX}}.beagle.gz \
         --snp_weights \
         --sites_save \
+        --minMaf {params.minmaf} \
         --threads {threads} \
         --out {params.outdir}/${{PREFIX}} \
         &>> {log}
